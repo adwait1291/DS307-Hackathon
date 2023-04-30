@@ -33,7 +33,7 @@ stations_dict = {
 "nttf":"NTTF","hosayallapurcross":"Hosa Yallapur Cross","tollnakka":"Toll Nakka","vidyagiri":"Vidyagiri",
 "gandhinagar":"Gandhi Nagar","lakamanahalli":"Lakamanahalli","sattur":"Sattur","sdmmedicalcollege":"SDM Medical College","navalurrailwaystation":"Navalur Railway Station",
 "kmf":"KMF-1","rayapur":"Rayapur","iskcontemple":"Iskcon Temple","rtooffice":"RTO Office","navanagar":"Navanagar","ampcgate":"AMPC 3rd Gate","shantiniketan":"Shantiniketan",
-"baridevarakoppa":"Baridevarakoppa","unakallake":"Unakal Lake","unakal":"Unakal","unakalcross":"Unakal Cross","bvbcollege":"BVB College","vidyanagar":"Vidyanagar","kims":"KIMS",
+"baridevarakoppa":"Baridevarakoppa","unakallake":"Unakal Lake","unakal":"Unakal","unakalcross":"Unakal Cross","bvbcollege":"BVB College","vidynagar":"Vidyanagar","kims":"KIMS",
 "hosurregionalterminal":"Hosur Regional Terminal","hosurcross":"Hosur Cross","drbrambedkarcircle":"Dr. B R Ambedkar Circle","huballicentralbusterminal":"Huballi Central Bus Terminal",
 "cbthuballi":"CBT Huballi"
  }
@@ -265,6 +265,7 @@ def main():
                     matches = [word for word in stations if word.startswith(generated_text.lower())]
                     if not matches:
                         generated_text=generated_text[:-1]
+                    matches = [word for word in stations if word.startswith(generated_text.lower())]
 
                     station_list.write("\n".join([f"- {stations_dict[item]}" for item in matches]), allow_markdown=True)
 
