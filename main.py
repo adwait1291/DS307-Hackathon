@@ -1,7 +1,22 @@
-import streamlit as st
+# ----------------------IMPORT ESSENTIAL PACKAGES----------------------
+
+
+
 import cv2
 import time
+import os
+import cv2
+import base64
+import requests
+import json
+import spacy
 import numpy as np
+from gtts import gTTS
+import streamlit as st
+
+# ----------------------INITIAL SET-UP----------------------
+
+
 
 st.set_page_config(layout="wide")
 
@@ -26,8 +41,10 @@ stations_dict = {
 stations = list(stations_dict.keys())
 print(stations)
 
-from gtts import gTTS
-import os
+
+# ----------------------ESSENTIAL FUNCTIONS FOR WORKING----------------------
+
+
 
 # Define the text to convert to speech
 def play_sound(text):
@@ -38,14 +55,30 @@ def play_sound(text):
     # Play the audio file using the default media player
     os.system("afplay test.mp3")
 
+#Define function to match input textwith stations from the list
+def spacy_match(input_text, word_list):
+    # Load a pre-trained Spacy model
+    nlp = spacy.load('en_core_web_md')
+
+    # Get the vector representation of the input text
+    input_vector = nlp(input_text).vector
+
+    # Calculate the cosine similarity between the input vector and the vectors of each word in the list
+    similarities = []
+    for word in word_list:
+        word_vector = nlp(word).vector
+        similarity = np.dot(input_vector, word_vector) / (np.linalg.norm(input_vector) * np.linalg.norm(word_vector))
+        similarities.append(similarity)
+
+    # Return the word from the list with the highest similarity to the input text
+    return word_list[np.argmax(similarities)]
 
 
-import cv2
-import base64
-import numpy as np
-import requests
-import time
-import json
+
+
+# ----------------------LOAD MODEL FROM ROBOFLOW----------------------
+
+
 
 # Construct the Roboflow Infer URL
 # (if running locally replace https://classify.roboflow.com/ with eg http://127.0.0.1:9001/)
@@ -57,6 +90,11 @@ from roboflow import Roboflow
 rf = Roboflow(api_key="tXBF80SyixvY9Se6iorC")
 project = rf.workspace().project("sign-detection-6ibui")
 model = project.version(1).model
+
+
+# ---------------------- SET UP FRAME CONTRAINTS AND CAMERA SETTINGS----------------------
+
+
 
 # infer on a local image
 
@@ -95,6 +133,9 @@ background-size: cover;
 }}
 </style>
 '''
+# ----------------------HUMAN FACE AND PROXIMITY DETECTION ----------------------
+
+
 
 st.markdown(page_bg, unsafe_allow_html=True)
 
@@ -140,6 +181,11 @@ def get_label(img):
 
     preds = resp.json()
     return preds["predictions"][0]["class"] if preds["predictions"] else ""
+
+
+
+# ----------------------MAIN FUNCTION----------------------
+
 
 
 # Define the main function that runs the web app
