@@ -1,0 +1,6 @@
+opencv-python==4.5.3.56
+numpy==1.19.5
+gtts==2.2.3
+streamlit==0.88.0
+requests==2.26.0
+spacy==3.2.0
