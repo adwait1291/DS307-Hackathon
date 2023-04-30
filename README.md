@@ -17,7 +17,7 @@ To use ASL Assist, follow these steps:
 1. Open the ASL Assist web application by running `streamlit run app.py`.
 2. Bring face within 50cm proximity to begin capturing sign language footage.
 3. Sign the name of the station you wish to book a ticket for character by character
-4. Show the "Space" symbol to end the footage capture process.
+4. Show the "Space" symbol to confirm the booking tickets.
 5. The captured footage will be processed by the system and the corresponding text will be displayed on the screen.
 6. "Please book a ticket for <station_name>" will be automatically spoken out loud in the counter person speaker.
 7. Proceed to the counter and collect your ticket.
