@@ -43,13 +43,15 @@ stations = list(stations_dict.keys())
 
 # Define the text to convert to speech
 def play_sound(text):
+
+    # Hindi
     # hindi_text= "कृपया"+text+" का टिकट बुक करें"
-    # tts = gTTS(text=text, lang='hi')
+    # tts = gTTS(text=hindi_text, lang='hi')
 
+    # English
     text = "Please book a ticket for "+text
-
-    # Create a gTTS object and generate the audio file
     tts = gTTS(text=text, lang='en')
+
     tts.save("test.mp3")
 
     # Play the audio file using the default media player
@@ -192,6 +194,9 @@ def main():
         wrongHeader = st.empty()
         header2 = st.empty()
         station_list = st.empty()
+        confirm1 = st.empty()
+        confirm2 = st.empty()
+
 
     with col1:
         timer_text = st.empty()
@@ -216,7 +221,18 @@ def main():
         bimg = frame[y:y+h, x:x+w]
         # cv2.imshow("Cropped ROI", bimg)
 
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        # cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        color = (255, 0, 0)  # RGB color code for dark blue
+        thickness = 6
+        cv2.rectangle(frame, (x, y), (x+w, y+h), color, thickness)
+
+        # Add text at the top of the rectangle
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        text = 'Show Your Sign Here'
+        text_size = cv2.getTextSize(text, font, 1.4, thickness)[0]
+        text_x = x + int((w - text_size[0]) / 2)
+        text_y = y - text_size[1]
+        cv2.putText(frame, text, (text_x, 50), font, 1.4, (0, 0, 0), 2, cv2.LINE_AA)
 
         # Detect faces and get the appropriate text
         
@@ -270,7 +286,16 @@ def main():
                     st.session_state.start_time = time.time()
 
                     if len(matches)==1:
-                        play_sound(matches[0])
+
+                        if txt!="space":
+                            confirm1.write(f"<h3>Sign 'Space' to Confirm</h3>", unsafe_allow_html=True)
+                            confirm2.write(f"<h3>Sign 'Del' to Delete</h3>", unsafe_allow_html=True)
+
+                        else:
+                            confirm1.write('BOOKED', unsafe_allow_html=True)
+                            confirm2.write(f"<h3>" "</h3>", unsafe_allow_html=True)
+                            wrongHeader.markdown('<p style="text-align:center"><span style="font-size:50px;color:green;">&#10004;</span></p>', unsafe_allow_html=True)
+                            play_sound(matches[0])
 
 
                 # Display the timer in seconds
