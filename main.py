@@ -43,6 +43,9 @@ stations = list(stations_dict.keys())
 
 # Define the text to convert to speech
 def play_sound(text):
+    # hindi_text= "कृपया"+text+" का टिकट बुक करें"
+    # tts = gTTS(text=text, lang='hi')
+
     text = "Please book a ticket for "+text
 
     # Create a gTTS object and generate the audio file
