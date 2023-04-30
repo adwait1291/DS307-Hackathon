@@ -11,6 +11,29 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 # Initialize the camera
 cap = cv2.VideoCapture(0)
 
+stations = [
+"Dharwad BRTS Terminal",
+"Jubilee Circle","Court Circle",
+"NTTF","Hosa Yallapur Cross","Toll Nakka","Vidyagiri",
+"Gandhi Nagar","Lakamanahalli","Sattur","SDM Medical College","Navalur Railway Station",
+"KMF-1","Rayapur","Iskcon Temple","RTO Office","Navanagar","AMPC 3rd Gate","Shantiniketan",
+"Baridevarakoppa","Unakal Lake","Unakal","Unakal Cross","BVB College","Vidyanagar","KIMS",
+"Hosur Regional Terminal","Hosur Cross","Dr. B R Ambedkar Circle","Huballi Central Bus Terminal",
+"CBT Huballi"]
+
+
+
+from gtts import gTTS
+import os
+
+# Define the text to convert to speech
+def play_sound(text):
+    # Create a gTTS object and generate the audio file
+    text = "Please book a ticket for "+text
+    tts = gTTS(text=text, lang='en')
+    tts.save("test.mp3")
+    # Play the audio file using the default media player
+    os.system("afplay test.mp3")
 
 
 
@@ -23,10 +46,16 @@ import json
 
 # Construct the Roboflow Infer URL
 # (if running locally replace https://classify.roboflow.com/ with eg http://127.0.0.1:9001/)
+# upload_url = "https://classify.roboflow.com/text-elnqt/1?api_key=tXBF80SyixvY9Se6iorC"
+
 upload_url = "https://classify.roboflow.com/text-elnqt/1?api_key=tXBF80SyixvY9Se6iorC"
 
+from roboflow import Roboflow
+rf = Roboflow(api_key="tXBF80SyixvY9Se6iorC")
+project = rf.workspace().project("sign-detection-6ibui")
+model = project.version(1).model
 
-
+# infer on a local image
 
 
 # Set the width and height of the camera feed to 640x480
@@ -40,11 +69,6 @@ face_width = 14
 
 # Set the distance threshold for face detection
 threshold_distance = 30
-
-from roboflow import Roboflow
-rf = Roboflow(api_key="NkdlEq0xkYZXpHT00Yk3")
-project = rf.workspace().project("abcd-ifyky")
-model = project.version(1).model
 
 
 page_bg = f'''
@@ -95,10 +119,13 @@ def detect_faces(frame):
             
 
 def get_label(img):
-    # response = model.predict(image).json()
+    # response = model.predict(img, confidence=20, overlap=30).json()
     # label = response["predictions"][0]["class"] if response["predictions"] else ""
     # return label
 
+
+
+# image classification
     # Encode image to base64 string
     retval, buffer = cv2.imencode('.jpg', img)
     img_str = base64.b64encode(buffer)
@@ -109,7 +136,7 @@ def get_label(img):
     }, stream=True)
 
     preds = resp.json()
-    return preds["predictions"][0]["class"]
+    return preds["predictions"][0]["class"] if preds["predictions"] else ""
 
 
 # Define the main function that runs the web app
@@ -123,6 +150,7 @@ def main():
 
     with col2:
         header2 = st.empty()
+        station_list = st.empty()
 
     with col1:
         timer_text = st.empty()
@@ -134,25 +162,40 @@ def main():
 
     generated_text = ""
 
+
+
+    x, y, w, h = int(cap.get(3)/2), 0, int(cap.get(3)/2), int(cap.get(4))
+
+
     while True:
         # Read the frame from the camera
         _, frame = cap.read()
+        frame = cv2.flip(frame, 1)
 
+        bimg = frame[y:y+h, x:x+w]
+        # cv2.imshow("Cropped ROI", bimg)
+
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
         # Detect faces and get the appropriate text
         
         with col1:
             isFace = detect_faces(frame)
             if isFace == 0 and time.time() - last_detection_time >= 30:
-                header.write("<div class='center'><h1>Use for interaction in sign language!</h1></div>", unsafe_allow_html=True)
+                header.write("<div class='center'><h1>Use Me for Interaction in Sign Language!</h1></div>", unsafe_allow_html=True)
                 generated_text = ""
         
             else:
-                header.write("<div class='top'><h1>Welcome!</h1></div>", unsafe_allow_html=True)
+                header.write("<div class='top'><h1>Please Sign the Name of Your Station Here.</h1></div>", unsafe_allow_html=True)
+
+
                 frame = cv2.resize(frame, (0, 0), fx=0.45, fy=0.5)
+                
 
                 # Convert the frame from BGR (OpenCV default) to RGB (Streamlit default)
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                bimg = cv2.cvtColor(bimg, cv2.COLOR_BGR2RGB)
+
 
                 placeholder.image(frame, channels="RGB")
 
@@ -160,12 +203,26 @@ def main():
 
                 if "start_time" not in st.session_state:
                     st.session_state.start_time = time.time()
+                    if not generated_text:
+                        station_list.write("\n".join([f"- {item}" for item in stations]), allow_markdown=True)
+
                 elif time.time() - st.session_state.start_time > 5:
-                    txt = get_label(frame)
-                    if txt!="nothing":
+                    txt = get_label(bimg)
+                    if txt!="nothing" and txt!="space" and txt!="del":
                         generated_text+=txt
+
+                    if txt=="del":
+                        generated_text = generated_text[:-1]
+
+                    matches = [word for word in stations if word.startswith(generated_text)]
+                    station_list.write("\n".join([f"- {item}" for item in matches]), allow_markdown=True)
+
                     header2.write(f"<h1>{generated_text}</h1>", unsafe_allow_html=True)
                     st.session_state.start_time = time.time()
+
+                    if len(matches)==1:
+                        play_sound(matches[0])
+
 
                 # Display the timer in seconds
                 remaining_time = int(5 - (time.time() - st.session_state.start_time))
