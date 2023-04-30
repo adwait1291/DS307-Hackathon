@@ -217,7 +217,8 @@ def main():
                     if txt=="del":
                         generated_text = generated_text[:-1]
                     matches = [word for word in stations if word.startswith(generated_text.lower())]
-                    
+                    if not matches:
+                        generated_text=generated_text[:-1]
 
                     station_list.write("\n".join([f"- {stations_dict[item]}" for item in matches]), allow_markdown=True)
 
