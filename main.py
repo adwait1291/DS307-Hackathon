@@ -12,6 +12,7 @@ import numpy as np
 from gtts import gTTS
 import streamlit as st
 from roboflow import Roboflow
+# import subprocess
 
 
 # ----------------------INITIAL SET-UP----------------------
@@ -107,7 +108,7 @@ focal_length = 900
 face_width = 14
 
 # Set the distance threshold for face detection
-threshold_distance = 40
+threshold_distance = 30
 
 
 page_bg = f'''
@@ -296,7 +297,9 @@ def main():
                             confirm2.write(f"<h3>" "</h3>", unsafe_allow_html=True)
                             wrongHeader.markdown('<p style="text-align:center"><span style="font-size:50px;color:green;">&#10004;</span></p>', unsafe_allow_html=True)
                             play_sound(matches[0])
-
+                            # subprocess.Popen("streamlit run main.py", shell=True)
+                            # st.stop()
+                            
 
                 # Display the timer in seconds
                 remaining_time = int(5 - (time.time() - st.session_state.start_time))
