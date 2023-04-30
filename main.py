@@ -1,7 +1,5 @@
 # ----------------------IMPORT ESSENTIAL PACKAGES----------------------
 
-
-
 import cv2
 import time
 import os
@@ -14,9 +12,8 @@ import numpy as np
 from gtts import gTTS
 import streamlit as st
 
+
 # ----------------------INITIAL SET-UP----------------------
-
-
 
 st.set_page_config(layout="wide")
 
@@ -26,7 +23,7 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 # Initialize the camera
 cap = cv2.VideoCapture(0)
 
-
+# Stor BRTS stations name
 stations_dict = {
 "dharwadbrtsterminal":"Dharwad BRTS Terminal",
 "jubileecircle":"Jubilee Circle","courtcircle":"Court Circle",
@@ -39,21 +36,23 @@ stations_dict = {
  }
 
 stations = list(stations_dict.keys())
-print(stations)
+
 
 
 # ----------------------ESSENTIAL FUNCTIONS FOR WORKING----------------------
 
-
-
 # Define the text to convert to speech
 def play_sound(text):
-    # Create a gTTS object and generate the audio file
     text = "Please book a ticket for "+text
+
+    # Create a gTTS object and generate the audio file
     tts = gTTS(text=text, lang='en')
     tts.save("test.mp3")
+
     # Play the audio file using the default media player
     os.system("afplay test.mp3")
+
+
 
 #Define function to match input textwith stations from the list
 def spacy_match(input_text, word_list):
@@ -78,8 +77,6 @@ def spacy_match(input_text, word_list):
 
 # ----------------------LOAD MODEL FROM ROBOFLOW----------------------
 
-
-
 # Construct the Roboflow Infer URL
 # (if running locally replace https://classify.roboflow.com/ with eg http://127.0.0.1:9001/)
 # upload_url = "https://classify.roboflow.com/text-elnqt/1?api_key=tXBF80SyixvY9Se6iorC"
@@ -92,12 +89,8 @@ project = rf.workspace().project("sign-detection-6ibui")
 model = project.version(1).model
 
 
+
 # ---------------------- SET UP FRAME CONTRAINTS AND CAMERA SETTINGS----------------------
-
-
-
-# infer on a local image
-
 
 # Set the width and height of the camera feed to 640x480
 # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 790)
@@ -109,7 +102,7 @@ focal_length = 900
 face_width = 14
 
 # Set the distance threshold for face detection
-threshold_distance = 30
+threshold_distance = 40
 
 
 page_bg = f'''
@@ -134,8 +127,6 @@ background-size: cover;
 </style>
 '''
 # ----------------------HUMAN FACE AND PROXIMITY DETECTION ----------------------
-
-
 
 st.markdown(page_bg, unsafe_allow_html=True)
 
@@ -163,13 +154,12 @@ def detect_faces(frame):
             
 
 def get_label(img):
+    # Object Detection
     # response = model.predict(img, confidence=20, overlap=30).json()
     # label = response["predictions"][0]["class"] if response["predictions"] else ""
     # return label
 
-
-
-# image classification
+    # Image Classification
     # Encode image to base64 string
     retval, buffer = cv2.imencode('.jpg', img)
     img_str = base64.b64encode(buffer)
@@ -186,8 +176,6 @@ def get_label(img):
 
 # ----------------------MAIN FUNCTION----------------------
 
-
-
 # Define the main function that runs the web app
 def main():
     
@@ -198,6 +186,7 @@ def main():
 
 
     with col2:
+        wrongHeader = st.empty()
         header2 = st.empty()
         station_list = st.empty()
 
@@ -259,12 +248,17 @@ def main():
                     txt = get_label(bimg)
                     if txt!="nothing" and txt!="space" and txt!="del":
                         generated_text+=txt
+                        wrongHeader.markdown('<p style="text-align:center"><span style="font-size:50px;color:green;">&#10004;</span></p>', unsafe_allow_html=True)
+                    else:
+                        wrongHeader.markdown('<p style="text-align:center"><span style="font-size:50px;color:red;">&#10060;</span></p>', unsafe_allow_html=True)
+
 
                     if txt=="del":
                         generated_text = generated_text[:-1]
                     matches = [word for word in stations if word.startswith(generated_text.lower())]
                     if not matches:
                         generated_text=generated_text[:-1]
+                        wrongHeader.markdown('<p style="text-align:center"><span style="font-size:50px;color:red;">&#10060;</span></p>', unsafe_allow_html=True)
                     matches = [word for word in stations if word.startswith(generated_text.lower())]
 
                     station_list.write("\n".join([f"- {stations_dict[item]}" for item in matches]), allow_markdown=True)
@@ -279,9 +273,6 @@ def main():
                 # Display the timer in seconds
                 remaining_time = int(5 - (time.time() - st.session_state.start_time))
                 timer_text.text(f"Timer: {remaining_time}s")
-
-
-                # get_label(frame)
 
 
         # Check for quit command
