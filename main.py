@@ -23,7 +23,7 @@ import json
 
 # Construct the Roboflow Infer URL
 # (if running locally replace https://classify.roboflow.com/ with eg http://127.0.0.1:9001/)
-upload_url = "https://classify.roboflow.com/abcd-ifyky/1?api_key=NkdlEq0xkYZXpHT00Yk3"
+upload_url = "https://classify.roboflow.com/text-elnqt/1?api_key=tXBF80SyixvY9Se6iorC"
 
 
 
@@ -162,7 +162,8 @@ def main():
                     st.session_state.start_time = time.time()
                 elif time.time() - st.session_state.start_time > 5:
                     txt = get_label(frame)
-                    generated_text+=txt
+                    if txt!="nothing":
+                        generated_text+=txt
                     header2.write(f"<h1>{generated_text}</h1>", unsafe_allow_html=True)
                     st.session_state.start_time = time.time()
 
