@@ -4,3 +4,4 @@ gtts==2.2.3
 streamlit==0.88.0
 requests==2.26.0
 spacy==3.2.0
+roboflow

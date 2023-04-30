@@ -11,6 +11,7 @@ import spacy
 import numpy as np
 from gtts import gTTS
 import streamlit as st
+from roboflow import Roboflow
 
 
 # ----------------------INITIAL SET-UP----------------------
@@ -88,7 +89,6 @@ def spacy_match(input_text, word_list):
 
 upload_url = "https://classify.roboflow.com/text-elnqt/1?api_key=tXBF80SyixvY9Se6iorC"
 
-from roboflow import Roboflow
 rf = Roboflow(api_key="tXBF80SyixvY9Se6iorC")
 project = rf.workspace().project("sign-detection-6ibui")
 model = project.version(1).model
