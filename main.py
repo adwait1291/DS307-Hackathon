@@ -11,17 +11,20 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 # Initialize the camera
 cap = cv2.VideoCapture(0)
 
-stations = [
-"Dharwad BRTS Terminal",
-"Jubilee Circle","Court Circle",
-"NTTF","Hosa Yallapur Cross","Toll Nakka","Vidyagiri",
-"Gandhi Nagar","Lakamanahalli","Sattur","SDM Medical College","Navalur Railway Station",
-"KMF-1","Rayapur","Iskcon Temple","RTO Office","Navanagar","AMPC 3rd Gate","Shantiniketan",
-"Baridevarakoppa","Unakal Lake","Unakal","Unakal Cross","BVB College","Vidyanagar","KIMS",
-"Hosur Regional Terminal","Hosur Cross","Dr. B R Ambedkar Circle","Huballi Central Bus Terminal",
-"CBT Huballi"]
 
+stations_dict = {
+"dharwadbrtsterminal":"Dharwad BRTS Terminal",
+"jubileecircle":"Jubilee Circle","courtcircle":"Court Circle",
+"nttf":"NTTF","hosayallapurcross":"Hosa Yallapur Cross","tollnakka":"Toll Nakka","vidyagiri":"Vidyagiri",
+"gandhinagar":"Gandhi Nagar","lakamanahalli":"Lakamanahalli","sattur":"Sattur","sdmmedicalcollege":"SDM Medical College","navalurrailwaystation":"Navalur Railway Station",
+"kmf":"KMF-1","rayapur":"Rayapur","iskcontemple":"Iskcon Temple","rtooffice":"RTO Office","navanagar":"Navanagar","ampcgate":"AMPC 3rd Gate","shantiniketan":"Shantiniketan",
+"baridevarakoppa":"Baridevarakoppa","unakallake":"Unakal Lake","unakal":"Unakal","unakalcross":"Unakal Cross","bvbcollege":"BVB College","vidyanagar":"Vidyanagar","kims":"KIMS",
+"hosurregionalterminal":"Hosur Regional Terminal","hosurcross":"Hosur Cross","drbrambedkarcircle":"Dr. B R Ambedkar Circle","huballicentralbusterminal":"Huballi Central Bus Terminal",
+"cbthuballi":"CBT Huballi"
+ }
 
+stations = list(stations_dict.keys())
+print(stations)
 
 from gtts import gTTS
 import os
@@ -204,7 +207,7 @@ def main():
                 if "start_time" not in st.session_state:
                     st.session_state.start_time = time.time()
                     if not generated_text:
-                        station_list.write("\n".join([f"- {item}" for item in stations]), allow_markdown=True)
+                        station_list.write("\n".join([f"- {stations_dict[item]}" for item in stations]), allow_markdown=True)
 
                 elif time.time() - st.session_state.start_time > 5:
                     txt = get_label(bimg)
@@ -213,9 +216,10 @@ def main():
 
                     if txt=="del":
                         generated_text = generated_text[:-1]
+                    matches = [word for word in stations if word.startswith(generated_text.lower())]
+                    
 
-                    matches = [word for word in stations if word.startswith(generated_text)]
-                    station_list.write("\n".join([f"- {item}" for item in matches]), allow_markdown=True)
+                    station_list.write("\n".join([f"- {stations_dict[item]}" for item in matches]), allow_markdown=True)
 
                     header2.write(f"<h1>{generated_text}</h1>", unsafe_allow_html=True)
                     st.session_state.start_time = time.time()
