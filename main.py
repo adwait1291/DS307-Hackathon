@@ -12,7 +12,6 @@ import numpy as np
 from gtts import gTTS
 import streamlit as st
 from roboflow import Roboflow
-# import subprocess
 
 
 # ----------------------INITIAL SET-UP----------------------
@@ -25,7 +24,7 @@ face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_fronta
 # Initialize the camera
 cap = cv2.VideoCapture(0)
 
-# Stor BRTS stations name
+# Store BRTS stations name
 stations_dict = {
 "dharwadbrtsterminal":"Dharwad BRTS Terminal",
 "jubileecircle":"Jubilee Circle","courtcircle":"Court Circle",
@@ -62,38 +61,29 @@ def play_sound(text):
 
 
 #Define function to match input textwith stations from the list
-def spacy_match(input_text, word_list):
-    # Load a pre-trained Spacy model
-    nlp = spacy.load('en_core_web_md')
+# def spacy_match(input_text, word_list):
+#     # Load a pre-trained Spacy model
+#     nlp = spacy.load('en_core_web_md')
 
-    # Get the vector representation of the input text
-    input_vector = nlp(input_text).vector
+#     # Get the vector representation of the input text
+#     input_vector = nlp(input_text).vector
 
-    # Calculate the cosine similarity between the input vector and the vectors of each word in the list
-    similarities = []
-    for word in word_list:
-        word_vector = nlp(word).vector
-        similarity = np.dot(input_vector, word_vector) / (np.linalg.norm(input_vector) * np.linalg.norm(word_vector))
-        similarities.append(similarity)
+#     # Calculate the cosine similarity between the input vector and the vectors of each word in the list
+#     similarities = []
+#     for word in word_list:
+#         word_vector = nlp(word).vector
+#         similarity = np.dot(input_vector, word_vector) / (np.linalg.norm(input_vector) * np.linalg.norm(word_vector))
+#         similarities.append(similarity)
 
-    # Return the word from the list with the highest similarity to the input text
-    return word_list[np.argmax(similarities)]
+#     # Return the word from the list with the highest similarity to the input text
+#     return word_list[np.argmax(similarities)]
 
 
 
 
 # ----------------------LOAD MODEL FROM ROBOFLOW----------------------
 
-# Construct the Roboflow Infer URL
-# (if running locally replace https://classify.roboflow.com/ with eg http://127.0.0.1:9001/)
-# upload_url = "https://classify.roboflow.com/text-elnqt/1?api_key=tXBF80SyixvY9Se6iorC"
-
-upload_url = "https://classify.roboflow.com/text-elnqt/1?api_key=tXBF80SyixvY9Se6iorC"
-
-rf = Roboflow(api_key="tXBF80SyixvY9Se6iorC")
-project = rf.workspace().project("sign-detection-6ibui")
-model = project.version(1).model
-
+upload_url = "Your Roboflow Classification URL"
 
 
 # ---------------------- SET UP FRAME CONTRAINTS AND CAMERA SETTINGS----------------------
@@ -160,13 +150,7 @@ def detect_faces(frame):
             
 
 def get_label(img):
-    # Object Detection
-    # response = model.predict(img, confidence=20, overlap=30).json()
-    # label = response["predictions"][0]["class"] if response["predictions"] else ""
-    # return label
-
-    # Image Classification
-    # Encode image to base64 string
+ 
     retval, buffer = cv2.imencode('.jpg', img)
     img_str = base64.b64encode(buffer)
 
