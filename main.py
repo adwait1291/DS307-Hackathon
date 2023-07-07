@@ -86,7 +86,7 @@ def play_sound(text):
 upload_url = "Your Roboflow Classification URL"
 
 
-# ---------------------- SET UP FRAME CONTRAINTS AND CAMERA SETTINGS----------------------
+# ---------------------- SET UP FRAME CONSTRAINTS AND CAMERA SETTINGS----------------------
 
 # Set the width and height of the camera feed to 640x480
 # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 790)
